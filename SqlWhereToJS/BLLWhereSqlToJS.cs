@@ -10,6 +10,7 @@ namespace SqlWhereToJS
     {
         public const string PATTERNLIKE = "(?<=[^a-z_0-9])([a-z_0-9]+)\\s+like\\s+'(%?[\\wÀ-ú0-9]+%?)'";
         public const string PATTERNIN = "([a-z_0-9]+)\\s+(in|not in)\\s*\\(([\\wÀ-ú0-9,'\\s]+)\\)";
+        public const string PATTERNDATEADD = "(([a-z_]+) *([>=<!]{1,3}) *(dateAdd *\\(([a-z]+) *, *-*([0-9]+),.+\\)))";
 
         public static string Convert(string strSql)
         {
@@ -18,6 +19,7 @@ namespace SqlWhereToJS
 
             try
             {
+                
                 retJS = ReplaceSqlToJS(strSql);
 
             }
@@ -41,12 +43,11 @@ namespace SqlWhereToJS
                 new PatternReplace() { Description = "And", Search = "(and)", Replace = "&&" },
                 new PatternReplace() { Description = "Or", Search = "(or)", Replace = "||" },
                 new PatternReplace() { Description = "IsNull", Search = "(is null)", Replace = "=== null" },
-                //new PatternReplace() { Description = "Quote", Search = "'", Replace = "\"" },
                 new PatternReplace() { Description = "Bracket", Search = "[\\[\\]]", Replace = String.Empty },
 
             };
 
-
+            //Efetuando alguns replaces padrões
             foreach (PatternReplace pattern in listReplace)
             {
                 strSQL = Regex.Replace(strSQL, pattern.Search, pattern.Replace, RegexOptions.IgnoreCase);
@@ -54,8 +55,14 @@ namespace SqlWhereToJS
 
             try
             {
+                //tratando instruções LIKE
                 strSQL = Regex.Replace(strSQL, PATTERNLIKE, ReplaceLikeSqlToJs, RegexOptions.IgnoreCase);
+                //tratando instruções IN
                 strSQL = Regex.Replace(strSQL, PATTERNIN, ReplaceInSqlToJs, RegexOptions.IgnoreCase);
+                //tratando instruções DateAdd
+                strSQL = convertDateAdd(strSQL);
+
+                
             }
             catch (FormatException ex)
             {
@@ -64,6 +71,60 @@ namespace SqlWhereToJS
 
             return strSQL;
 
+        }
+
+        private static string convertDateAdd(string strSql)
+        {
+
+            string strJS = String.Empty;
+
+            if(!strSql.ToLower().Contains("dateadd")) {
+                return strSql;
+            }
+            
+            string[] ret;
+            string retString = String.Empty;
+            //O regex só identifica uma dateAdd por vez, então criamos um array para tratar todos AND e OR
+            //ret = strSql.Split(new string [] { "||", "&&" }, StringSplitOptions.RemoveEmptyEntries);
+            string pattern = "([&/|]{2})";
+           ret = Regex.Split(strSql, pattern);
+
+
+            foreach (string str in ret)
+            {
+                strJS += Regex.Replace(str, PATTERNDATEADD, ReplaceDateAddSqlToJs, RegexOptions.IgnoreCase);
+                //strSql = strSql.Replace(str, retString);
+            }
+            
+            return strJS;
+
+        }
+
+
+        private static string ReplaceDateAddSqlToJs(Match match)
+        {
+            string strJs;
+            if (match.Groups.Count > 1)
+            {
+                string strField = match.Groups[2].Value;
+                string strOperator = match.Groups[3].Value;
+                string strReplace = match.Groups[4].Value;
+                string srtDateType = match.Groups[5].Value;
+                string strValue = match.Groups[6].Value;
+
+                bool endDate = match.Value.ToLower().Contains("dbo.end") ? true : false;
+
+
+                strJs = $"DateJS.convertDate({strField}) {strOperator} DateJS.DateAdd('{srtDateType}', {strValue}, '{strOperator}', {endDate.ToString().ToLower()})";
+
+               
+            } else
+            {
+                throw new System.FormatException($"Error Query SQL [DateAdd] Badly Formatted, partial query: {match.Value}  ");
+            }
+
+
+            return strJs;
         }
 
         private static string ReplaceInSqlToJs(Match match)
@@ -96,9 +157,6 @@ namespace SqlWhereToJS
                 {
                     strInJs = $"{strField}.match({strRegexIn}) != null";
                 }
-
-
-
             }
             else
             {
