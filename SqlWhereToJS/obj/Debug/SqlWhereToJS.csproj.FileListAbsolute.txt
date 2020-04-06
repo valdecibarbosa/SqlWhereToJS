@@ -8,6 +8,6 @@ C:\Users\admin\Documents\Projetos\SqlWhereToJS\SqlWhereToJS\SqlWhereToJS\obj\Deb
 C:\Users\admin\Documents\Projetos\SqlWhereToJS\SqlWhereToJS\bin\Debug\SqlWhereToJS.exe.config
 C:\Users\admin\Documents\Projetos\SqlWhereToJS\SqlWhereToJS\bin\Debug\SqlWhereToJS.exe
 C:\Users\admin\Documents\Projetos\SqlWhereToJS\SqlWhereToJS\bin\Debug\SqlWhereToJS.pdb
-C:\Users\admin\Documents\Projetos\SqlWhereToJS\SqlWhereToJS\obj\Debug\SqlWhereToJS.csprojAssemblyReference.cache
 C:\Users\admin\Documents\Projetos\SqlWhereToJS\SqlWhereToJS\obj\Debug\SqlWhereToJS.exe
 C:\Users\admin\Documents\Projetos\SqlWhereToJS\SqlWhereToJS\obj\Debug\SqlWhereToJS.pdb
+C:\Users\admin\Documents\Projetos\SqlWhereToJS\SqlWhereToJS\obj\Debug\SqlWhereToJS.csprojAssemblyReference.cache

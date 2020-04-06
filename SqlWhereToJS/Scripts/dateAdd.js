@@ -1,4 +1,5 @@
 class DateJS {
+  
   convertDate(sqlDate) {
     return new Date(sqlDate).getTime();
   }
@@ -50,7 +51,7 @@ class DateJS {
   getEndWeek(dateInput) {
     let aux = this.getEndDay(dateInput);
     let day = aux.getDay(),
-      diff = aux.getDate() - day + 7; //+ (day == 0 ? -6 : 1); // adjust when day is sunday
+      diff = aux.getDate() - day + 6; //+ (day == 0 ? -6 : 1); // adjust when day is sunday
     return new Date(aux.setDate(diff));
   }
 
@@ -64,7 +65,7 @@ class DateJS {
 
     return new Date(
       aux.getFullYear(),
-      aux.getMonth(),
+      aux.getMonth() + 1,
       0,
       aux.getHours(),
       aux.getMinutes(),
@@ -77,6 +78,7 @@ class DateJS {
     let aux = this.getBeginMonth(dateInput);
     return new Date(aux.getFullYear(), 0, 1);
   }
+  
   getEndYear(dateInput) {
     let aux = this.getEndMonth(dateInput);
     return new Date(
@@ -90,11 +92,10 @@ class DateJS {
     );
   }
 
-  dateAdd(dateType, intValue, logicOperator, endDate) {
+  dateAdd(dateType, intValue, endDate) {
     /**
      *  dateType: (mi, HH, dd, ww, mm, yyyy)
      *  intValue: (integer)
-     *  logicOperator: (===, !==, >, >==, <, <== )
      *  endDate: boolean
      */
 
@@ -103,15 +104,10 @@ class DateJS {
     let convertedDate;
     let dateAdd;
     const now = new Date();
-    const revertOperator =
-      logicOperator == "<" || logicOperator == "<==" ? true : false;
 
     switch (dateType) {
       case "mi":
-        dateAdd =
-          revertOperator == true
-            ? new Date(now.setMinutes(now.getMinutes() - intValue))
-            : new Date(now.setMinutes(now.getMinutes() + intValue));
+        dateAdd = new Date(now.setMinutes(now.getMinutes() + intValue));
         convertedDate =
           endDate == true
             ? this.getEndMinute(dateAdd)
@@ -119,10 +115,7 @@ class DateJS {
 
         break;
       case "HH":
-        dateAdd =
-          revertOperator == true
-            ? new Date(now.setHours(now.getHours() - intValue))
-            : new Date(now.setHours(now.getHours() + intValue));
+        dateAdd = new Date(now.setHours(now.getHours() + intValue));
 
         convertedDate =
           endDate == true
@@ -131,19 +124,12 @@ class DateJS {
 
         break;
       case "dd":
-        dateAdd =
-          revertOperator == true
-            ? new Date(now.setDate(now.getDate() - intValue))
-            : new Date(now.setDate(now.getDate() + intValue));
+        dateAdd = new Date(now.setDate(now.getDate() + intValue));
         convertedDate =
           endDate == true ? this.getEndDay(dateAdd) : this.getBeginDay(dateAdd);
-
         break;
       case "ww":
-        dateAdd =
-          revertOperator == true
-            ? new Date(now.setDate(now.getDate() - intValue * 7))
-            : new Date(now.setDate(now.getDate() + intValue * 7));
+        dateAdd = new Date(now.setDate(now.getDate() + intValue * 7));
 
         convertedDate =
           endDate == true
@@ -152,20 +138,14 @@ class DateJS {
 
         break;
       case "mm":
-        dateAdd =
-          revertOperator == true
-            ? new Date(now.setMonth(now.getMonth() - intValue))
-            : new Date(now.setMonth(now.getMonth() + intValue));
+        dateAdd = new Date(now.setMonth(now.getMonth() + intValue));
         convertedDate =
           endDate == true
             ? this.getEndMonth(dateAdd)
             : this.getBeginMonth(dateAdd);
         break;
       case "yyyy":
-        dateAdd =
-          revertOperator == true
-            ? new Date(now.setFullYear(now.getFullYear() - intValue))
-            : new Date(now.setFullYear(now.getFullYear() + intValue));
+        dateAdd = new Date(now.setFullYear(now.getFullYear() + intValue));
 
         convertedDate =
           endDate == true
@@ -177,15 +157,11 @@ class DateJS {
         console.log("type date invalid");
     }
 
-    /* console.log(
-      "data Convertida",
-      convertedDate.toLocaleString("pt-BR", { hour12: false })
-    );*/
-
     return convertedDate.getTime();
   }
-}
-let minhaClass = new DateJS();
+};
+
+let DateJs = new DateJS();
 
 //minhaClass.dateAddJs("mi", 10);
 //minhaClass.dateAddJs("hh", 2);
@@ -198,23 +174,47 @@ let minhaClass = new DateJS();
 
 //console.log(new Date(aux.getFullYear(), aux.getMonth(), 1));
 //console.log(new Date(aux.getFullYear(), aux.getMonth() + 1, 0));
+//DateJs.convertDate(VGX_DT_INICIO_VIGENCIA) >== DateJs.dateAdd('mi', 2, '>==', false)
 
-const dateSqlJs = minhaClass.convertDate("2020-04-03 18:00:00.000");
+
+
+//DateJs.convertDate(VGX_DT_INICIO_VIGENCIA) < DateJs.dateAdd('mi', 3, '<', false)
+//DateJs.convertDate(VGX_DT_INICIO_VIGENCIA) <== DateJs.dateAdd('mi', 4, '<==', false)
+
+const dateSqlJs = DateJs.convertDate("2020-04-22 15:00:30.000")
 console.log("data do banco convertida", new Date(dateSqlJs));
 
-let convertedDate = minhaClass.dateAdd("HH", 0, ">", false);
-console.log("data Convertida UTC", new Date(convertedDate));
+let convertedDate = DateJs.dateAdd('yyyy', 2, false) 
+console.log("data DateADD UTC", new Date(convertedDate));
+
+let convertedDate2 = DateJs.dateAdd('yyyy', 2, true)
+console.log("data DateADD UTC", new Date(convertedDate2));
 
 console.log(
-  "data Convertida BR",
+  "data DateADD BR",
   new Date(convertedDate).toLocaleString("pt-BR", { hour12: false })
 );
 
+console.log(
+  "data DateADD BR",
+  new Date(convertedDate2).toLocaleString("pt-BR", { hour12: false })
+)
+
+
+var InsertDate = "2020-04-22 15:00:30.000";
+
+//DateJs.convertDate(InsertDate) < DateJs.dateAdd('yyyy', 3, '<', false)  ||   DateJs.convertDate(InsertDate) <= DateJs.dateAdd('yyyy', 4, '<=', false)
+
 let result;
-if (dateSqlJs == convertedDate) {
+if (! (  DateJs.convertDate(InsertDate) >= DateJs.dateAdd('yyyy', 2, false)   &&       DateJs.convertDate(InsertDate) <= DateJs.dateAdd('yyyy', 2, true)   )) {
   result = true;
 } else {
   result = false;
 }
 
 console.log("result: ", result);
+
+
+
+//comendo o ultimo ) na instrução de == (Between)
+//pegar valor negativo da query na regex

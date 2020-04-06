@@ -10,7 +10,8 @@ namespace SqlWhereToJS
     {
         public const string PATTERNLIKE = "(?<=[^a-z_0-9])([a-z_0-9]+)\\s+like\\s+'(%?[\\wÀ-ú0-9]+%?)'";
         public const string PATTERNIN = "([a-z_0-9]+)\\s+(in|not in)\\s*\\(([\\wÀ-ú0-9,'\\s]+)\\)";
-        public const string PATTERNDATEADD = "(([a-z_]+) *([>=<!]{1,3}) *(dateAdd *\\(([a-z]+) *, *-*([0-9]+),.+\\)))";
+        //public const string PATTERNDATEADD = "(([a-z_]+) *([>=<!]{1,2}) * (dateAdd *\\(([a-z]+) *, *([-]?\\d+),.+\\)))";
+        public const string PATTERNDATEADD = "(([a-z_]+) *([>=<!]{1,2}) *(dateAdd *\\(([a-z]+) *, *([-]?\\d+),.+\\){2}))";
 
         public static string Convert(string strSql)
         {
@@ -38,10 +39,11 @@ namespace SqlWhereToJS
 
             List<PatternReplace> listReplace = new List<PatternReplace>
             {
-                new PatternReplace() { Description = "Iqual", Search = "[=]", Replace = "==" },
+                new PatternReplace() { Description = "Iqual", Search = " +[=]", Replace = "==" },
                 new PatternReplace() { Description = "AliasTable", Search = "(A\\.|B\\.)", Replace = string.Empty },
                 new PatternReplace() { Description = "And", Search = "(and)", Replace = "&&" },
                 new PatternReplace() { Description = "Or", Search = "(or)", Replace = "||" },
+                new PatternReplace() { Description = "Not", Search = "(not)", Replace = "!" },
                 new PatternReplace() { Description = "IsNull", Search = "(is null)", Replace = "=== null" },
                 new PatternReplace() { Description = "Bracket", Search = "[\\[\\]]", Replace = String.Empty },
 
@@ -115,7 +117,7 @@ namespace SqlWhereToJS
                 bool endDate = match.Value.ToLower().Contains("dbo.end") ? true : false;
 
 
-                strJs = $"DateJS.convertDate({strField}) {strOperator} DateJS.DateAdd('{srtDateType}', {strValue}, '{strOperator}', {endDate.ToString().ToLower()})";
+                strJs = $"DateJs.convertDate({strField}) {strOperator} DateJs.dateAdd('{srtDateType}', {strValue}, {endDate.ToString().ToLower()})";
 
                
             } else
