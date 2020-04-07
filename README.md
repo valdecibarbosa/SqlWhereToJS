@@ -38,7 +38,7 @@ Exemplo:
 
 ```javascript
 let result;
-if (! (  DateJs.convertDate(InsertDate) >= DateJs.dateAdd('yyyy', 2, false)   &&       DateJs.convertDate(InsertDate) <= DateJs.dateAdd('yyyy', 2, true)   )) {
+if (!(DateJs.convertDate(InsertDate) >= DateJs.dateAdd('yyyy', 2, false) && DateJs.convertDate(InsertDate) <= DateJs.dateAdd('yyyy', 2, true))) {
   result = true;
 } else {
   result = false;
