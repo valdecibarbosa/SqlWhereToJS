@@ -160,5 +160,3 @@ class DateJS {
     return convertedDate.getTime();
   }
 };
-
-let DateJs = new DateJS();
