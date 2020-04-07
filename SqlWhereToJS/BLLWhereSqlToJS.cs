@@ -10,8 +10,7 @@ namespace SqlWhereToJS
     {
         public const string PATTERNLIKE = "(?<=[^a-z_0-9])([a-z_0-9]+)\\s+like\\s+'(%?[\\wÀ-ú0-9]+%?)'";
         public const string PATTERNIN = "([a-z_0-9]+)\\s+(in|not in)\\s*\\(([\\wÀ-ú0-9,'\\s]+)\\)";
-        //public const string PATTERNDATEADD = "(([a-z_]+) *([>=<!]{1,2}) * (dateAdd *\\(([a-z]+) *, *([-]?\\d+),.+\\)))";
-        public const string PATTERNDATEADD = "(([a-z_]+) *([>=<!]{1,2}) *(dateAdd *\\(([a-z]+) *, *([-]?\\d+),.+\\){2}))";
+        public const string PATTERNDATEADD = "(([a-z_]+)\\s*([>=<!]{1,2})\\s*(dateAdd\\s*\\(([a-z]+)\\s*,\\s*([-]?\\d+),\\s*[^\\)]+(\\)\\s*){2}))";
 
         public static string Convert(string strSql)
         {
@@ -43,7 +42,7 @@ namespace SqlWhereToJS
                 new PatternReplace() { Description = "AliasTable", Search = "(A\\.|B\\.)", Replace = string.Empty },
                 new PatternReplace() { Description = "And", Search = "(and)", Replace = "&&" },
                 new PatternReplace() { Description = "Or", Search = "(or)", Replace = "||" },
-                new PatternReplace() { Description = "Not", Search = "(not)", Replace = "!" },
+                new PatternReplace() { Description = "Not", Search = "(NOT(?!\\s?IN))", Replace = "!" },
                 new PatternReplace() { Description = "IsNull", Search = "(is null)", Replace = "=== null" },
                 new PatternReplace() { Description = "Bracket", Search = "[\\[\\]]", Replace = String.Empty },
 
@@ -62,7 +61,7 @@ namespace SqlWhereToJS
                 //tratando instruções IN
                 strSQL = Regex.Replace(strSQL, PATTERNIN, ReplaceInSqlToJs, RegexOptions.IgnoreCase);
                 //tratando instruções DateAdd
-                strSQL = convertDateAdd(strSQL);
+                strSQL = ConvertDateAdd(strSQL);
 
                 
             }
@@ -75,7 +74,7 @@ namespace SqlWhereToJS
 
         }
 
-        private static string convertDateAdd(string strSql)
+        private static string ConvertDateAdd(string strSql)
         {
 
             string strJS = String.Empty;
@@ -95,7 +94,6 @@ namespace SqlWhereToJS
             foreach (string str in ret)
             {
                 strJS += Regex.Replace(str, PATTERNDATEADD, ReplaceDateAddSqlToJs, RegexOptions.IgnoreCase);
-                //strSql = strSql.Replace(str, retString);
             }
             
             return strJS;

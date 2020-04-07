@@ -13,8 +13,10 @@ namespace SqlWhereToJS
             //string strSQL = "A.[VGX_DT_INICIO_VIGENCIA] >=  dateadd (yyyy , 2 ,  DateAdd(yy, DateDiff(yy, 0, getdate()) - 0, 0)   )  OR   A.[VGX_DT_INICIO_VIGENCIA] < dateadd (yyyy , -3 ,  DateAdd(yy, DateDiff(yy, 0, getdate()) - 0, 0) AND A.[VGX_DT_INICIO_VIGENCIA] < dateadd (mm , -5 ,  DateAdd(yy, DateDiff(yy, 0, getdate()) - 0, 0))";
             //string strSQL = "(A.[VGX_DT_INICIO_VIGENCIA] >=  dateadd (yyyy , 5 ,  DBO.BeginYear()  )  and  A.[VGX_DT_INICIO_VIGENCIA] <=  dateadd (yyyy , 5 ,  DBO.EndYear()  ))";
             //string strSQL = "(A.[VGX_DT_INICIO_VIGENCIA] >= dateadd (yyyy, 5, DBO.BeginYear()) and A.[VGX_DT_INICIO_VIGENCIA] <= dateadd (yyyy, 5, DBO.EndYear())) ";
-            string strSQL = "not (  A.[InsertDate] >=      dateadd(yyyy,2,DBO.BeginYear())   and       A.[InsertDate] <=  dateadd(yyyy,2,DBO.EndYear())   )";
-            
+            //string strSQL = "not (  A.[InsertDate] >=      dateadd(yyyy,2,DBO.BeginYear())   and       A.[InsertDate] <=  dateadd(yyyy,2,DBO.EndYear())   )";
+            //string strSQL = "(DDI == '55' && DDD NOT IN('11','12','13'))";
+            string strSQL = "A.[VGX_DT_INICIO_VIGENCIA]    >   dateadd(yyyy,1,DBO.BeginYear())  OR   A.[VGX_DT_INICIO_VIGENCIA]    >=   dateadd(yyyy,2,DBO.BeginYear())  OR   A.[VGX_DT_INICIO_VIGENCIA]    >=   dateadd(yyyy,3,DBO.BeginYear())  OR   A.[VGX_DT_INICIO_VIGENCIA]    >=   dateadd(yyyy,4,DBO.BeginYear())  OR    (A.[VGX_DT_INICIO_VIGENCIA] >=      dateadd(yyyy,5,DBO.BeginYear())   and    A.[VGX_DT_INICIO_VIGENCIA] <=  dateadd(yyyy,5,DBO.EndYear())   ) OR  not (  A.[VGX_DT_INICIO_VIGENCIA] >=      dateadd(yyyy,6,DBO.BeginYear())   and    A.[VGX_DT_INICIO_VIGENCIA] <=  dateadd(yyyy,6,DBO.EndYear())   )";
+
             try
             {
                 var teste = BLLWhereSqlToJS.Convert(strSQL);
